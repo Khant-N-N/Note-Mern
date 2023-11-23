@@ -7,5 +7,7 @@ const router = express.Router();
 router.get("/get-notes", noteControllers.getNotes);
 router.get("/get-note/:id", noteControllers.getNote);
 router.post("/create", noteControllers.createNote);
+router.patch("/update/:id", noteControllers.updateNote);
+router.delete("/delete/:id", noteControllers.deleteNote);
 
 export default router;
