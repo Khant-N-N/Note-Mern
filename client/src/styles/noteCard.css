@@ -1,0 +1,30 @@
+.cardContainer {
+    background-color: rgb(41, 37, 29);
+    color: rgb(237, 241, 229);
+    height: 13rem;
+    min-width: 150px;
+    cursor: pointer;
+    transition: box-shadow .2s ease-in;
+}
+
+.cardContainer:hover {
+    box-shadow: 1px 1px 9px 3px #000;
+}
+
+.cardBody {
+    overflow: hidden;
+    position: relative;
+}
+
+.cardText {
+    white-space: pre-line;
+}
+
+.cover-tranparent {
+    background: linear-gradient(360deg, rgb(41, 37, 29) 5%, transparent);
+    opacity: .8;
+    height: 4rem;
+    width: 100%;
+    position: absolute;
+    bottom: 0;
+}
