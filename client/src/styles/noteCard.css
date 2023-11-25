@@ -2,6 +2,7 @@
     background-color: rgb(41, 37, 29);
     color: rgb(237, 241, 229);
     height: 13rem;
+    width: 22rem;
     min-width: 150px;
     transition: box-shadow .2s ease-in;
     position: relative;

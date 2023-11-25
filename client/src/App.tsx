@@ -3,11 +3,13 @@ import { NoteType } from "./models/note";
 import axios from "axios";
 import Note from "./components/Note";
 import Navbar from "./components/Navbar";
-import AddNewNote from "./components/AddNewNote";
+import AddEditNewNote from "./components/AddEditNewNote";
 
 const App = () => {
   const [noteData, setNoteData] = useState<NoteType[]>([]);
   const [isAddNote, setIsAddNote] = useState(false);
+  const [noteToEdit, setNoteToEdit] = useState<NoteType | null>(null);
+
   useEffect(() => {
     const getNoteData = async () => {
       try {
@@ -31,18 +33,53 @@ const App = () => {
           + New Note
         </button>
         {isAddNote && (
-          <AddNewNote
+          <AddEditNewNote
+            formID="NewForm"
             onNoteSave={(newNote) => {
               setIsAddNote(false);
               setNoteData([...noteData, newNote]);
             }}
-            onDismiss={() => setIsAddNote(false)}
+            onDismiss={() => {
+              setIsAddNote(false);
+            }}
+          />
+        )}
+        {noteToEdit && (
+          <AddEditNewNote
+            formID="EditForm"
+            noteToEdit={noteToEdit}
+            onNoteSave={(newNote) => {
+              setIsAddNote(false);
+              setNoteData(() =>
+                noteData.map((note) =>
+                  note._id === newNote._id ? newNote : note
+                )
+              );
+              setNoteToEdit(null);
+            }}
+            onDismiss={() => {
+              setIsAddNote(false);
+              setNoteToEdit(null);
+            }}
           />
         )}
       </section>
-      <section className="container-fluid gap-4 row py-5 d-flex justify-content-center">
+      <section
+        style={{ maxWidth: "1300px" }}
+        className="container-fluid gap-4 row py-5 d-flex justify-content-center mx-auto"
+      >
         {noteData?.map((note) => (
-          <Note note={note} key={note._id} />
+          <Note
+            onNoteEdit={(note) => {
+              setNoteToEdit(note);
+              setIsAddNote(true);
+            }}
+            setNoteData={(id) =>
+              setNoteData(noteData.filter((note) => note._id !== id))
+            }
+            note={note}
+            key={note._id}
+          />
         ))}
       </section>
     </main>

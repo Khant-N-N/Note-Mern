@@ -1,25 +1,40 @@
 import { Form, Modal } from "react-bootstrap";
-import { useState } from "react";
+import React, { useState } from "react";
 import axios from "axios";
 import { NoteType } from "../models/note";
 
 interface newNoteProps {
+  formID: string;
+  noteToEdit?: NoteType | null;
   onNoteSave: (note: NoteType) => void;
   onDismiss: () => void;
 }
-const AddNewNote = ({ onDismiss, onNoteSave }: newNoteProps) => {
+const AddEditNewNote = ({
+  formID,
+  noteToEdit,
+  onDismiss,
+  onNoteSave,
+}: newNoteProps) => {
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
-    title: "",
-    text: "",
+    title: noteToEdit?.title || "",
+    text: noteToEdit?.text || "",
   });
-  console.log(formData);
 
-  const handleSubmit = async (e: SubmitEvent) => {
+  const handleSubmit: React.FormEventHandler<HTMLFormElement> = async (e) => {
     e.preventDefault();
     try {
       setLoading(true);
-      const res = await axios.post("api/notes/create", formData);
+
+      let res;
+      if (noteToEdit) {
+        res = await axios.patch(
+          `/api/notes/update/${noteToEdit._id}`,
+          formData
+        );
+      } else {
+        res = await axios.post("/api/notes/create", formData);
+      }
       onNoteSave(res.data);
       setLoading(false);
     } catch (error) {
@@ -31,16 +46,17 @@ const AddNewNote = ({ onDismiss, onNoteSave }: newNoteProps) => {
   return (
     <Modal show onHide={onDismiss} className="bg-secondary">
       <Modal.Header closeButton>
-        <Modal.Title>Add Note</Modal.Title>
+        <Modal.Title>{noteToEdit ? "Edit Note" : "Add Note"}</Modal.Title>
       </Modal.Header>
       <Modal.Body>
-        <Form onSubmit={handleSubmit} className="py-3 px-2" id="addNewNote">
+        <Form onSubmit={handleSubmit} className="py-3 px-2" id={formID}>
           <Form.Group>
             <Form.Label>Title</Form.Label>
             <Form.Control
               onChange={(e) =>
                 setFormData({ ...formData, title: e.target.value })
               }
+              value={formData.title}
               type="text"
               placeholder="Enter Title"
               required
@@ -52,6 +68,7 @@ const AddNewNote = ({ onDismiss, onNoteSave }: newNoteProps) => {
               onChange={(e) =>
                 setFormData({ ...formData, text: e.target.value })
               }
+              value={formData.text}
               as="textarea"
               rows={4}
               placeholder="Enter Note"
@@ -61,9 +78,9 @@ const AddNewNote = ({ onDismiss, onNoteSave }: newNoteProps) => {
       </Modal.Body>
       <Modal.Footer>
         <button
-          className="w-100 btn btn-primary text-light"
+          className="w-100 btn btn-dark text-light"
           type="submit"
-          form="addNewNote"
+          form={formID}
           disabled={loading}
         >
           {loading ? "Saving" : "Save"}
@@ -73,4 +90,4 @@ const AddNewNote = ({ onDismiss, onNoteSave }: newNoteProps) => {
   );
 };
 
-export default AddNewNote;
+export default AddEditNewNote;

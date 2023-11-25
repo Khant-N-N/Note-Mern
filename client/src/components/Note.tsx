@@ -8,9 +8,11 @@ import { useState } from "react";
 import axios from "axios";
 
 interface noteProps {
+  onNoteEdit: (note: NoteType) => void;
   note: NoteType;
+  setNoteData: (id: string) => void;
 }
-const Note = ({ note }: noteProps) => {
+const Note = ({ note, onNoteEdit, setNoteData }: noteProps) => {
   const { _id, title, text, createdAt, updatedAt } = note;
   const [isDelete, setIsDelete] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
@@ -23,9 +25,9 @@ const Note = ({ note }: noteProps) => {
   const deleteNote = async (id: string) => {
     setLoading(true);
     try {
-      const response = await axios.delete(`/api/notes/delete/${id}`);
-      console.log(response);
+      await axios.delete(`/api/notes/delete/${id}`);
 
+      setNoteData(id);
       setLoading(false);
     } catch (error) {
       console.error(error);
@@ -34,12 +36,14 @@ const Note = ({ note }: noteProps) => {
   };
 
   return (
-    <Card style={{ width: "20rem" }} className="cardContainer z-1">
+    <Card className="cardContainer z-1">
       <div
-        className="position-absolute d-flex gap-2 end-0 top-0 pe-3 pt-3 z-2"
-        style={{ fontSize: "1.1rem" }}
+        className="position-absolute d-flex gap-2 end-0 top-0 p-2 z-2"
+        style={{ fontSize: "1.1rem", backgroundColor: "rgba(41, 37, 29, .8)" }}
       >
-        {!isDelete && <ImPencil className="icons" />}
+        {!isDelete && (
+          <ImPencil onClick={() => onNoteEdit(note)} className="icons" />
+        )}
         {!isDelete && (
           <IoTrash className="icons" onClick={() => setIsDelete(true)} />
         )}
@@ -70,7 +74,7 @@ const Note = ({ note }: noteProps) => {
         <Card.Text className="cardText">{text}</Card.Text>
         <span className="cover-tranparent" />
       </Card.Body>
-      <Card.Footer>{createUpdateDate}</Card.Footer>
+      <Card.Footer className="text-secondary">{createUpdateDate}</Card.Footer>
     </Card>
   );
 };
