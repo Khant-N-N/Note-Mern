@@ -9,14 +9,19 @@ const App = () => {
   const [noteData, setNoteData] = useState<NoteType[]>([]);
   const [isAddNote, setIsAddNote] = useState(false);
   const [noteToEdit, setNoteToEdit] = useState<NoteType | null>(null);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const getNoteData = async () => {
       try {
+        setLoading(true);
         const response = await axios.get("/api/notes/get-notes");
         setNoteData(response.data);
+        setLoading(false);
       } catch (error) {
         console.error(error);
+        alert(error);
+        setLoading(false);
       }
     };
     getNoteData();
@@ -68,19 +73,26 @@ const App = () => {
         style={{ maxWidth: "1300px" }}
         className="container-fluid gap-4 row py-5 d-flex justify-content-center mx-auto"
       >
-        {noteData?.map((note) => (
-          <Note
-            onNoteEdit={(note) => {
-              setNoteToEdit(note);
-              setIsAddNote(true);
-            }}
-            setNoteData={(id) =>
-              setNoteData(noteData.filter((note) => note._id !== id))
-            }
-            note={note}
-            key={note._id}
-          />
-        ))}
+        {noteData?.length === 0 && (
+          <div className="text-center">You don't have any note yet.</div>
+        )}
+        {loading ? (
+          <div className="text-center">Loading...</div>
+        ) : (
+          noteData?.map((note) => (
+            <Note
+              onNoteEdit={(note) => {
+                setNoteToEdit(note);
+                setIsAddNote(true);
+              }}
+              setNoteData={(id) =>
+                setNoteData(noteData.filter((note) => note._id !== id))
+              }
+              note={note}
+              key={note._id}
+            />
+          ))
+        )}
       </section>
     </main>
   );
