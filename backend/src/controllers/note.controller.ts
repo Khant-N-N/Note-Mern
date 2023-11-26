@@ -2,7 +2,6 @@ import { RequestHandler } from "express";
 import NoteModel from "../models/note.model";
 import createHttpError from "http-errors";
 import mongoose from "mongoose";
-import noteModel from "../models/note.model";
 
 export const getNotes: RequestHandler = async (req, res, next) => {
   try {
